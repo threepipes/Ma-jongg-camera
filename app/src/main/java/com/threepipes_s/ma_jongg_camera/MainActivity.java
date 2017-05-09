@@ -1,6 +1,9 @@
 package com.threepipes_s.ma_jongg_camera;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -124,14 +127,31 @@ public class MainActivity extends Activity {
                 if(!dir.exists()) {
                     dir.mkdir();
                 }
-                File f = new File(dir, "img.jpg");
-                FileOutputStream fos = new FileOutputStream(f);
-                fos.write(data);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                RectF[] rects = Grid.createRects(width, height);
+                for(int i = 0; i < rects.length; i++) {
+                    RectF rect = rects[i];
+                    Bitmap subImage = Bitmap.createBitmap(
+                            bitmap,
+                            (int)rect.left, (int)rect.top, (int)rect.width(), (int)rect.height(),
+                            null, true
+                    );
+
+                    File f = new File(dir, "img_" + i + ".jpg");
+                    FileOutputStream fos = new FileOutputStream(f);
+//                    fos.write(data);
+                    subImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.close();
+                }
+
                 Toast.makeText(getApplicationContext(),
                         "写真を保存しました", Toast.LENGTH_LONG).show();
-                fos.close();
                 cam.startPreview();
-            } catch (Exception e) { }
+            } catch (Exception e) {
+                Log.e("IMG", "Save image error: " + e);
+            }
         }
     }
 }

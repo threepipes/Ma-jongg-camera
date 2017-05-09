@@ -17,7 +17,7 @@ public class Grid extends View {
         p = new Paint();
         p.setColor(Color.DKGRAY);
         p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(2);
         setSize(0, 0);
     }
 
@@ -28,15 +28,21 @@ public class Grid extends View {
     }
 
     public void setSize(int w, int h) {
+        rects = createRects(w, h);
+        r = (int)(rects[0].width() / 10);
+    }
+
+    public static RectF[] createRects(int w, int h) {
         int wid = w / 15;
         int hei = wid * 7 / 5;
         int y = h / 2 - hei / 2;
-        rects = new RectF[14];
-        r = wid / 10;
+        RectF[] rects = new RectF[14];
+//        r = wid / 10;
         for(int i = 0; i < 14; i++) {
             int x = wid * i + wid / 2;
             rects[i] = new RectF(x, y, x + wid, y + hei);
         }
+        return rects;
     }
 
     protected void onDraw(Canvas canvas){
